@@ -1,14 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using PersonsApi.Data;
-using PersonsApi.Entities;
 using PersonsApi.Models.DTOs;
+using PersonsApi.Entities;
 
 namespace PersonsApi.Services;
-
-public interface IPersonService
-{
-    Task<List<PersonResponseDto>> GetAllAsync();
-}
 
 public class PersonService(PersonDbContext context) : IPersonService
 {
@@ -21,12 +16,7 @@ public class PersonService(PersonDbContext context) : IPersonService
 
     public async Task CreatePersonAsync(PersonCreateDto dto)
     {
-        var entity = new PersonEntity
-        {
-            Name = dto.Name,
-            Age = dto.Age
-        };
-
+        var entity = new PersonEntity { Name = dto.Name, Age = dto.Age };
         context.Person.Add(entity);
         await context.SaveChangesAsync();
     }
