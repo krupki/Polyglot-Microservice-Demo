@@ -7,8 +7,8 @@ namespace PersonsApi.Entities
 {
     public class PersonEntity
     {
-        public Guid Id { get; set; }
-        public required string Name { get; set; }
+        public long Id { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int Age { get; set; }
     }
 }

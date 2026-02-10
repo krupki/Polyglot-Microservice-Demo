@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace PersonsApi.Models.DTOs
 {
-    public class PersonResponseDto
+    public class PersonResponseDto(long id, string name, int age)
     {
-        public Guid Id { get; set; }
-        public required string Name { get; set; }
-        public int Age { get; set; }
+        public long Id { get; init; } = id;
+        public string Name { get; init; } = name;
+        public int Age { get; init; } = age;
     }
 }
