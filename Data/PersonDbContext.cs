@@ -11,6 +11,7 @@ namespace PersonsApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PersonEntity>().ToTable("person");
+            modelBuilder.Entity<PersonEntity>().Property(p => p.Id).HasColumnName("id");
             modelBuilder.Entity<PersonEntity>().Property(p => p.Name).HasColumnName("name");
             modelBuilder.Entity<PersonEntity>().Property(p => p.Age).HasColumnName("age");
         }
