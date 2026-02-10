@@ -12,6 +12,9 @@ namespace PersonsApi.Data
         {
             modelBuilder.Entity<PersonEntity>().ToTable("person");
             modelBuilder.Entity<PersonEntity>().Property(p => p.Id).HasColumnName("id");
+            modelBuilder.Entity<PersonEntity>()
+        .Property(p => p.Id)
+        .UseSerialColumn();
             modelBuilder.Entity<PersonEntity>().Property(p => p.Name).HasColumnName("name");
             modelBuilder.Entity<PersonEntity>().Property(p => p.Age).HasColumnName("age");
         }
