@@ -1,12 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using PersonsApi.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<persons_db>(options =>
-    options.UseNpgsql(connectionString));
+var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
 
+builder.Services.AddDbContext<PersonDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
