@@ -19,6 +19,13 @@ public class PersonController(IPersonService personService) : ControllerBase
     public async Task<ActionResult> Create(PersonCreateDto dto)
     {
         await personService.CreatePersonAsync(dto);
-        return StatusCode(201); // Created
+        return StatusCode(201);
+    }
+
+    [HttpGet("sorted")]
+    public async Task<ActionResult<List<PersonResponseDto>>> GetSorted()
+    {
+        var sortedPersons = await personService.GetSortedFromGoAsync();
+        return Ok(sortedPersons);
     }
 }

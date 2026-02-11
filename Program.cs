@@ -10,6 +10,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 
 var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
 
