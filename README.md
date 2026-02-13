@@ -14,7 +14,7 @@ Infastructure: Docker & Docker Compose.
 
 ## Getting Started
 
-### Infrastructure:
+### Infrastructure
 
 ```Bash
 docker-compose up --build
@@ -27,3 +27,5 @@ docker-compose up --build
 **POST** /api/personen: Add person (DB-managed ID).
 
 **GET** /api/personen/sorted: Delegates sorting to the Go Worker via internal Docker DNS.
+
+Internally, the .NET orchestrator communicates with the Go sorter via gRPC.

@@ -1,12 +1,19 @@
+using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.EntityFrameworkCore;
 using PersonsApi.Data;
-using PersonsApi.Models.DTOs;
 using PersonsApi.Entities;
+using PersonsApi.Models.DTOs;
+using PersonsApi.Sorting;
 
 namespace PersonsApi.Services;
 
-public class PersonService(PersonDbContext context, IHttpClientFactory httpClientFactory) : IPersonService
+public class PersonService(PersonDbContext context, IConfiguration configuration) : IPersonService
 {
+    private readonly Sorter.SorterClient sorterClient = new(
+        GrpcChannel.ForAddress(
+            configuration["SortingService:GrpcUrl"] ?? throw new InvalidOperationException("SortingService:GrpcUrl configuration is missing")));
+
     public async Task<List<PersonResponseDto>> GetAllAsync()
     {
         return await context.Person
@@ -27,14 +34,20 @@ public class PersonService(PersonDbContext context, IHttpClientFactory httpClien
             .Select(p => new PersonResponseDto(p.Id, p.Name, p.Age))
             .ToListAsync();
 
-        var client = httpClientFactory.CreateClient();
-        var response = await client.PostAsJsonAsync("http://localhost:8081/sort", persons);
+        var request = new SortPersonsRequest();
+        request.Persons.AddRange(persons.Select(p =>
+            new Person { Id = p.Id, Name = p.Name, Age = p.Age }));
 
-        if (response.IsSuccessStatusCode)
+        try
         {
-            return await response.Content.ReadFromJsonAsync<List<PersonResponseDto>>() ?? persons;
+            var response = await sorterClient.SortPersonsAsync(request);
+            return response.Persons
+                .Select(p => new PersonResponseDto(p.Id, p.Name, p.Age))
+                .ToList();
         }
-
-        return persons;
+        catch (RpcException)
+        {
+            return persons;
+        }
     }
 }

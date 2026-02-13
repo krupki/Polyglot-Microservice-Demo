@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package sorting;
+
+option csharp_namespace = "PersonsApi.Sorting";
+option go_package = "sorting-service/sortingpb";
+
+message Person {
+  int64 id = 1;
+  string name = 2;
+  int32 age = 3;
+}
+
+message SortPersonsRequest {
+  repeated Person persons = 1;
+}
+
+message SortPersonsResponse {
+  repeated Person persons = 1;
+}
+
+service Sorter {
+  rpc SortPersons (SortPersonsRequest) returns (SortPersonsResponse);
+}

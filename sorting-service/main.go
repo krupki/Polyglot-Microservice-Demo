@@ -1,41 +1,42 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"net/http"
+	"net"
 	"sort"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+
+	"sorting-service/sortingpb"
 )
 
-type Person struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+type sorterServer struct {
+	sortingpb.UnimplementedSorterServer
 }
 
-func sortHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Nur POST ist erlaubt", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var persons []Person
-	err := json.NewDecoder(r.Body).Decode(&persons)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
+func (s *sorterServer) SortPersons(ctx context.Context, req *sortingpb.SortPersonsRequest) (*sortingpb.SortPersonsResponse, error) {
+	persons := append([]*sortingpb.Person(nil), req.GetPersons()...)
 	sort.Slice(persons, func(i, j int) bool {
 		return persons[i].Age < persons[j].Age
 	})
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(persons)
+	return &sortingpb.SortPersonsResponse{Persons: persons}, nil
 }
 
 func main() {
-	http.HandleFunc("/sort", sortHandler)
-	fmt.Println("Go-Sorter läuft auf Port 8081...")
-	http.ListenAndServe(":8081", nil)
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		panic(err)
+	}
+
+	grpcServer := grpc.NewServer()
+	sortingpb.RegisterSorterServer(grpcServer, &sorterServer{})
+	reflection.Register(grpcServer)
+
+	fmt.Println("Go gRPC sorter runs on :50051")
+	if err := grpcServer.Serve(lis); err != nil {
+		panic(err)
+	}
 }
